@@ -1,33 +1,34 @@
-// // Відстежуй на формі подію input, і щоразу записуй у локальне сховище об'єкт з полями email і message, 
-// у яких зберігай поточні значення полів форми. Нехай ключем для сховища буде рядок "feedback-form-state".
-// // Під час завантаження сторінки перевіряй стан сховища, і якщо там є збережені дані, заповнюй ними поля форми.
-//  В іншому випадку поля повинні бути порожніми.
-// // Під час сабміту форми очищуй сховище і поля форми, а також виводь у консоль об'єкт з полями email, 
-// message та їхніми поточними значеннями.
-// // Зроби так, щоб сховище оновлювалось не частіше, ніж раз на 500 мілісекунд. 
-// Для цього додай до проекту і використовуй бібліотеку lodash.throttle.
-
+import throttle from 'lodash.throttle';
 
 const refs = {
-    form: document.querySelector(".feedback-form"),
-    textarea: document.querySelector(".feedback-form  textarea"),
+  form: document.querySelector('.feedback-form'),
 };
 
-refs.form.addEventListener("submit", onFormSubmit);
-refs.textarea.addEventListener("input", onTexareaInput);
+const STORAGE_KEY = 'feedback-form-state';
 
+let formData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
-function onFormSubmit(e){
+populateText();
 
+const onInput = e => {
+  formData[e.target.name] = e.target.value;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
 };
 
-function onTexareaInput(e){
-const message = e.currentTarger.value;
-console.log(message);
-};
+refs.form.addEventListener('input', throttle(onInput, 500));
 
+refs.form.addEventListener('submit', e => {
+  e.preventDefault();
+  e.target.reset();
+  localStorage.removeItem(STORAGE_KEY);
+  formData = {};
+});
 
-function populateMessageOutput(){
+function populateText() {
+  const savedText = JSON.parse(localStorage.getItem(STORAGE_KEY));
 
-};
-
+  if (savedText) {
+    refs.form.email.value = savedText.email || '';
+    refs.form.message.value = savedText.message || '';
+  }
+}
