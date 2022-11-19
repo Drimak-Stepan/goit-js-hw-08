@@ -20,6 +20,7 @@ refs.form.addEventListener('input', throttle(onInput, 500));
 refs.form.addEventListener('submit', e => {
   e.preventDefault();
   e.target.reset();
+  console.log(JSON.parse(localStorage.getItem(STORAGE_KEY)));
   localStorage.removeItem(STORAGE_KEY);
   formData = {};
 });
